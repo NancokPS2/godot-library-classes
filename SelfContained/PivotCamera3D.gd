@@ -9,6 +9,7 @@ signal camera_ready(cameraRef)
 @onready var camera:Camera3D
 @export_range(0.01,10.0) var speed:float=1
 
+@export var fov:float = 90.0
 @export var controlsActive:bool=true
 @export var cameraActive:bool=true:
 	set(value):
@@ -19,6 +20,7 @@ func _ready() -> void:
 	setup_camera()
 	rotation_degrees = defaultRotation
 	cameraActive = true
+	
 
 
 func setup_camera(cameraPos:Vector3=defaultCameraPos, cameraRot:Vector3=defaultCameraPos):
@@ -26,6 +28,7 @@ func setup_camera(cameraPos:Vector3=defaultCameraPos, cameraRot:Vector3=defaultC
 	rotate_x(deg_to_rad(defaultCameraRot.x))
 	camera.position = cameraPos
 	rotation_degrees = cameraRot
+	camera.fov = fov
 	
 	add_child(camera)
 	emit_signal("camera_ready", camera)
