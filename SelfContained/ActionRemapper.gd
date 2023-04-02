@@ -89,8 +89,6 @@ func is_valid_event(event:InputEvent)-> bool:
 #	if event is InputEventJoypadButton or InputEventJoypadMotion and (inputTypeExcluded & InputTypes.JOYPAD): return false
 	
 	if event is InputEventKey:
-#		if (inputTypeExcluded & InputTypes.NUMBERS): 
-#			print("fuck")
 		if KeyLists.NUMBERS.has(event.keycode) and (inputTypeExcluded & InputTypes.NUMBERS): return false
 		if KeyLists.MODIFIERS.has(event.keycode) and (inputTypeExcluded & InputTypes.MODIFIERS): return false
 		if KeyLists.FUNCTIONS.has(event.keycode) and (inputTypeExcluded & InputTypes.FUNCTIONS): return false
@@ -100,13 +98,13 @@ func is_valid_event(event:InputEvent)-> bool:
 
 class SimpleControls extends Panel: #Creates a series of control nodes that allow for easy usage of the ActionRemapper, must be initialized with a reference to a remapper
 	
-	#These strings can be replaced by actions of your project
+	## These strings can be replaced by actions of your project
 	const defaultActions:Array[String] = ["move_forward", "move_backward", "move_left", "move_right", "primary_click", "secondary_click"]
 	
-	#The actions that will be shown in the list, setup() should be called after this is changed
+	## The actions that will be shown in the list, setup() should be called after this is changed
 	var validActions:Array[String] = defaultActions
 
-	#Automatically set with new()
+	## Automatically set with new()
 	var remapperReference:ActionRemapper
 	
 	func _init(remapper:ActionRemapper) -> void:

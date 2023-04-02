@@ -24,6 +24,12 @@ func _ready() -> void:
 	custom_minimum_size = dimensions; label.custom_minimum_size = dimensions
 	label.reset_size(); reset_size()
 	
+	label.text = text
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	add_child(label)
+	label.size = Vector2(get_viewport_rect().size.x/3, label.get_line_height()*label.get_line_count())
+	size = label.size
+	
 	if assignedNode is Control:
 		connect_signals()
 	else:
@@ -35,7 +41,7 @@ func connect_signals():
 
 func appear(value):
 	visible = value
-	set_process(value)
+#	set_process(value)
 	
 func update_dimensions():
 	dimensions = Vector2(dimensions.x, label.get_line_count() * label.get_line_height()) 
