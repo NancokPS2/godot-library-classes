@@ -34,7 +34,8 @@ func create_streamer(channel:String,type:StreamerType=StreamerType.NON_POSITIONA
 	channels[channel] = streamer
 	add_child(streamer)
 
-func add_stream(channel:String, audio:AudioStream):
+func add_stream(channel:String, audio:AudioStream, offset:float=0):
+	audio.set_meta("offset",offset)
 	channels[channel].stream = audio
 
 func control_streamer(channel:String,option:ControlOption,optionalParam=0.0):
@@ -44,7 +45,7 @@ func control_streamer(channel:String,option:ControlOption,optionalParam=0.0):
 		
 	match option:
 		ControlOption.PLAY:
-			channels[channel].play(optionalParam)
+			channels[channel].play( max( optionalParam, channels[channel].get_meta("offset",0.0) ) )
 			#if channels[channel].playing: channels[channel].play(optionalParam)
 		
 		ControlOption.STOP:

@@ -3,6 +3,8 @@ class_name ControlPopup
 
 signal popped(value)
 
+
+var currentlyPopped:bool
 @export var exclusive:bool = true #If true, everything else is paused when this appears
 
 func _ready() -> void:
@@ -13,6 +15,7 @@ func pop_up(active:bool=true):
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if exclusive and get_tree(): get_tree().paused = active
 	visible = active
+	currentlyPopped = active
 	emit_signal("popped",active)
 	
 	

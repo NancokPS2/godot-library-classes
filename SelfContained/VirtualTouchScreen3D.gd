@@ -23,6 +23,8 @@ var material:=StandardMaterial3D.new()
 			viewportRef = val
 			if cursorLayer.get_parent(): cursorLayer.get_parent().remove_child(cursorLayer)
 			viewportRef.add_child(cursorLayer)
+			cursorLayer.viewportRef = viewportRef
+			refresh_material()
 
 ## Direct reference to the MeshIsntance3D node in this scene that will be used, if none is set, one will be created on _ready().
 ## This is only for the node, the mesh that it will hold is created on runtime and will replace any already set.
@@ -67,6 +69,9 @@ func refresh_material():
 	var _texture:ViewportTexture = viewportRef.get_texture() 
 	if not material.resource_local_to_scene: material.setup_local_to_scene()
 	material.albedo_texture = _texture
+	
+func _init(_viewportRef:Viewport) -> void:
+	viewportRef = _viewportRef
 	
 func _ready() -> void:
 	if meshInstanceRef == null: meshInstanceRef = MeshInstance3D.new()

@@ -58,7 +58,7 @@ func _process(delta: float) -> void:
 		if Input.is_action_pressed("rotate_up"): rotation.x -= rotationSpeed * delta
 		elif Input.is_action_pressed("rotate_down"): rotation.x += rotationSpeed * delta
 		if Input.is_action_pressed("zoom_in"): cameraPos.z -= zoomSpeed * delta
-		elif Input.is_action_pressed("zoom_out"): cameraPos.z += zoomSpeed * 3 * delta
+		elif Input.is_action_pressed("zoom_out"): cameraPos.z += zoomSpeed * delta
 		rotation_degrees.x = clamp(rotation_degrees.x, -90, 90)
 		
 		

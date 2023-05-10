@@ -45,6 +45,7 @@ func load_single_scene(scene:PackedScene):
 
 ## Load all scenes in scenePaths and stores them on sceneScenes, you may specificy a different array if desired.
 func load_scenes(scenes:Array[String]=scenePaths):
+	print_debug("Loading scenes: " + str(scenes))
 	sceneArray.clear()
 	for path in scenes:
 		var scene:PackedScene = load(path)
