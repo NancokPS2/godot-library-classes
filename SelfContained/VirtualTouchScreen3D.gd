@@ -39,8 +39,6 @@ var material:=StandardMaterial3D.new()
 				meshInstanceRef.mesh.material = material
 			else:
 				push_error("This meshInstanceRef does not use a PrimitiveMesh, it cannot use materials")
-				
-
 			
 		elif val == null:
 			push_error("Null mesh.")
@@ -51,12 +49,13 @@ var material:=StandardMaterial3D.new()
 @export var cursorTexture:Texture#TEMP
 
 ## Reference to the CollisionShape3D node used by meshInstanceRef. Generally, this shouldn't be touched.
-var collisionShape:=CollisionShape3D.new():
+@export var collisionShape:=CollisionShape3D.new():
 	set(val):
 		collisionShape = val
-		var shape := BoxShape3D.new()
-		shape.size = Vector3(meshSize.x, 0.01, meshSize.y)
-		collisionShape.shape = shape
+		if not collisionShape is CollisionShape3D:
+			var shape := BoxShape3D.new()
+			shape.size = Vector3(meshSize.x, 0.01, meshSize.y)
+			collisionShape.shape = shape
 
 ## A reference to the CanvasLayer that parents the cursor, use cursorLayer.cursor to access the Sprite2D of the cursor
 var cursorLayer := CursorLayer.new(viewportRef, cursorTexture, get_viewport())
@@ -70,8 +69,8 @@ func refresh_material():
 	if not material.resource_local_to_scene: material.setup_local_to_scene()
 	material.albedo_texture = _texture
 	
-func _init(_viewportRef:Viewport) -> void:
-	viewportRef = _viewportRef
+#func _init(_viewportRef:Viewport) -> void:
+#	viewportRef = _viewportRef
 	
 func _ready() -> void:
 	if meshInstanceRef == null: meshInstanceRef = MeshInstance3D.new()

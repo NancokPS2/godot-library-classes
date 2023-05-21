@@ -1,12 +1,16 @@
- #This node MUST be in the tree in order to work. Simply change remappingAction to the name of the action you want to change and press an input for it.
-#You may also use the SimpleControls subclass to generate a simple UI that can control this.
-#To add a SimpleControls, use: add_child( ActionRemapper.SimpleControls.new($ActionRemapperNode) )
 extends Node
-class_name ActionRemapper
+#class_name ActionRemapper
+## This node MUST be in the tree in order to work. Simply change remappingAction to the name of the action you want to change and press an input for it.
+## You may also use the SimpleControls subclass to generate a simple UI that can control this.
+## To add a SimpleControls, use: add_child( ActionRemapper.SimpleControls.new($ActionRemapperNode) )
 
-signal remap_initiated(action)#Emitted when actionRemapping has been successfully set
+signal remap_initiated(action:String)#Emitted when actionRemapping has been successfully set
 signal remap_aborted
-signal successful_remap(action, event)#action is the name of the action, event is the InputEvent object assigned to it
+signal successful_remap(action:String, event:InputEvent)#action is the name of the action, event is the InputEvent object assigned to it
+signal applied_remaps
+
+enum InputSaveMapActions {SAVE, APPLY, RELOAD}
+
 const KeyLists = {#Definitions for certain key categories
 	"NUMBERS":[KEY_0,KEY_1,KEY_2,KEY_3,KEY_4,KEY_5,KEY_6,KEY_7,KEY_8,KEY_9,KEY_KP_0,KEY_KP_1,KEY_KP_2,KEY_KP_3,KEY_KP_4,KEY_KP_5,KEY_KP_6,KEY_KP_7,KEY_KP_8,KEY_KP_9],
 	"MODIFIERS":[KEY_CTRL, KEY_SHIFT],
@@ -16,26 +20,49 @@ const KeyLists = {#Definitions for certain key categories
 
 enum InputTypes {MOUSE_AXIS=1<<0, MOUSE_BUTTONS=1<<1, NUMBERS=1<<2, MODIFIERS=1<<3, FUNCTIONS=1<<4, JOYPAD=1<<5, TOGGLES=1<<6}
 
-#What kind of inputs should not be taken into account for remapping, should be set from the inspector
-#BUG: JOYPAD mappings are always excluded at the moment, due to engine bugs
+## What kind of inputs should not be taken into account for remapping, should be set from the inspector
+## BUG: JOYPAD mappings are always excluded at the moment, due to engine bugs
 @export_flags("MOUSE_AXIS:1", "MOUSE_BUTTONS:2", "NUMBERS:4", "MODIFIERS:8", "FUNCTIONS:16","JOYPAD:32", "TOGGLES:64") var inputTypeExcluded:int = InputTypes.MOUSE_AXIS + InputTypes.JOYPAD ## test
 
-#If true, prints information of what is happening to the Output
+## If true, prints information of what is happening to the Output
 @export var debugMode:bool=true
 
-#Keys that will cancel the remap attempt once initiated
+## Keys that will cancel the remap attempt once initiated
 @export var abortKeys:Array[int] = [KEY_ESCAPE]
 
-#How many events are allowed per action
+## How many events are allowed per action
 @export var maxEventsPerAction:int = 2
 
-#If true and the max amount of events are reached for the given action, replace the last one
+## If true and the max amount of events are reached for the given action, replace the last one
 @export var autoReplace:bool = true
+
+@export var inputSavePath:String:
+	set(val):
+		if val.is_valid_filename():
+			inputSavePath = val
+		else:
+			push_error("Invalid path.")
+	get:
+		if inputSavePath.is_valid_filename():
+			return inputSavePath
+		else: 
+			return ""
+
+var currentInputs:Dictionary
+
+
+@export var scrollControl:ScrollContainer
+
+
+## Automatically stores the InputMap before it starts doing anything, as to restore it later
+#var originalInputMap:=InputMapSave.new()
+
+
 
 #Set this to the name of an action to start the process
 var remappingAction:String = "":
 	set(value):
-		if not get_tree():
+		if not is_inside_tree():
 			push_error("ActionRemapper must be in the scene tree in order to work.")
 		else:
 			await get_tree().process_frame
@@ -43,10 +70,6 @@ var remappingAction:String = "":
 			if debugMode and remappingAction != "": print("Remapper is ready for input.")
 			if remappingAction != "": emit_signal("remap_initiated", remappingAction)
 
-	
-
-func get_events_from_action(action:StringName):
-	InputMap.action_get_events(action)
 	
 func remap_action(action:String,input:InputEvent, maxInputs:int = maxEventsPerAction, forceReplace:bool = autoReplace):
 	if not InputMap.has_action(action): 
@@ -57,22 +80,38 @@ func remap_action(action:String,input:InputEvent, maxInputs:int = maxEventsPerAc
 
 	if InputMap.action_get_events(action).size() >= maxInputs:#Too many inputs
 		if forceReplace:#Instructed to just replace them
-			var eventsInThisAction = InputMap.action_get_events(action)
-			InputMap.action_erase_event(action, eventsInThisAction[0])
+			currentInputs
+#			var eventsInThisAction = InputMap.action_get_events(action)
+#			InputMap.action_erase_event(action, eventsInThisAction[0])
 		else:
 		#InputMap.action_erase_events(action):
 			push_error("Too many events assigned to" + action + " remap aborted.")
 			emit_signal("remap_aborted")
 			return
-	
+
 	InputMap.action_add_event(action,input)
 	if debugMode: print("Successfully mapped: " + str(input) + " to action: " + action + ". Using device " + str(input.device) )
 	emit_signal("successful_remap", action, input)
 	remappingAction = ""
 
+#func remap_action(action:String,input:InputEvent, maxInputs:int = maxEventsPerAction, forceReplace:bool = autoReplace):
+#	if not currentInputs.has(action): currentInputs[action] = []
+#	if currentInputs[action].size() >= maxInputs:#Too many inputs
+#		if forceReplace:#Instructed to just replace them
+#			currentInputs[action][0] = input
+#		else:
+#			push_error("Too many events assigned to" + action + " remap aborted.")
+#			emit_signal("remap_aborted")
+#			return
+#
+#	currentInputs[action] = input
+#	if debugMode: print("Successfully mapped: " + str(input) + " to action: " + action + ". Using device " + str(input.device) )
+#	emit_signal("successful_remap", action, input)
+	
+
 func _input(event: InputEvent) -> void:
 	if remappingAction == "" or !is_valid_event(event): return
-	if debugMode: print("Attempted remap using event: " + str(event))
+	if debugMode: print( "Attempted remap using event {0} on action {1}.".format([event,remappingAction]) )
 	remap_action(remappingAction, event)
 
 func is_valid_event(event:InputEvent)-> bool:
@@ -96,7 +135,51 @@ func is_valid_event(event:InputEvent)-> bool:
 			
 	return true
 
-class SimpleControls extends Panel: #Creates a series of control nodes that allow for easy usage of the ActionRemapper, must be initialized with a reference to a remapper
+
+func manage_current_inputs(actionToPerform:InputSaveMapActions, inputs:Dictionary=currentInputs):
+	match actionToPerform:
+		InputSaveMapActions.SAVE:
+			if inputSavePath == "": push_error("Invalid path: {0} cannot save.".format([inputSavePath])); return
+			
+			var inputSave := InputMapSave.new()
+			inputSave.actionEvents = currentInputs.duplicate()
+			ResourceSaver.save(inputSave, inputSavePath)
+#			save.record_events()
+		InputSaveMapActions.APPLY:
+			for action in currentInputs:
+				if InputMap.has_action(action): InputMap.action_erase_events(action)
+					
+			for action in currentInputs:
+				var event:InputEvent = currentInputs[action]
+				InputMap.action_add_event(action, event)
+					
+			pass
+
+class InputMapSave extends Resource:
+	@export var actionEvents:Dictionary #"action":InputEvent
+	
+	func record_events(actions:Array[StringName], clearOld:bool=true):
+		if clearOld: actionEvents.clear()
+		for action in actions:
+			if InputMap.has_action(action):
+				actionEvents[action]=InputMap.action_get_events(action)
+			else:
+				push_error("The action {0} does not exist".format([action]))
+	
+	func apply_events(forceClear:bool=true):
+		if forceClear:
+			for action in actionEvents:
+				if InputMap.has_action(action): InputMap.action_erase_events(action)
+				
+		for action in actionEvents:
+			var event:InputEvent = actionEvents[action]
+			InputMap.action_add_event(action, event)
+			
+			
+				
+		
+	
+class SimpleControls extends VBoxContainer: #Creates a series of control nodes that allow for easy usage of the ActionRemapper, must be initialized with a reference to a remapper
 	
 	## These strings can be replaced by actions of your project
 	const defaultActions:Array[String] = ["move_forward", "move_backward", "move_left", "move_right", "primary_click", "secondary_click"]

@@ -19,6 +19,9 @@ const InputActions = {
 }
 
 func _unhandled_input(_event: InputEvent) -> void:
+	input_update(_event)
+	
+func input_update(event:InputEvent):
 	inputDir = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 
 func _physics_process(delta: float) -> void:
@@ -27,3 +30,4 @@ func _physics_process(delta: float) -> void:
 
 func _movement_physics(_delta: float) -> void:
 	pass
+

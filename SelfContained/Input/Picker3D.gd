@@ -4,9 +4,19 @@ class_name Picker3D
 enum QueriedInfo {COLLIDER,POSITION}
 var depth:float = 0.3
 
-@export var viewport:Viewport 
+@export var user:Node:
+	set(val):
+		user = val
+		if user is Node:
+			viewport = user.get_viewport()
+			assert(viewport is Viewport)
+			
+@export var viewport:Viewport:
+	set(val):
+		viewport = val 
+		if viewport is Viewport: world3d = viewport.find_world_3d()
 @export var rayLength:float = 1000
-@export_flags_3d_physics var collisionMask:int
+@export_flags_3d_physics var collisionMask:int = 1
 var world3d:World3D
 
 
@@ -14,7 +24,6 @@ var world3d:World3D
 var pathHolder:Path3D
 
 func get_from_mouse(info:QueriedInfo):
-	world3d = get_world_3d()
 	if !viewport or !world3d:
 		push_error("No Viewport or World3D has been set.")
 		
