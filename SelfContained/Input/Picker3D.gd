@@ -37,7 +37,7 @@ func get_from_mouse(info:QueriedInfo):
 		_curve.add_point(from)
 		_curve.add_point(to)
 		pathHolder.curve = _curve
-		add_child(pathHolder)
+		user.get_tree().root.add_child(pathHolder)
 
 	var rayParams:= PhysicsRayQueryParameters3D.create(from, to)
 	rayParams.collision_mask = collisionMask
