@@ -1,12 +1,11 @@
-extends Node3D
-class_name MovementSystem
+extends Node2D
+class_name BodyMover2D
 
 @export var bodyToMove:CharacterBody3D
 
 @export var speed = 5.0
 
-
-@export var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
+@export var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 var inputDir:Vector2
 var lookDir:Vector2
