@@ -16,9 +16,9 @@ You can simply drop any of the .gd files within your project's folder and they w
 | ControlPopup | Off-screen popup control node. | Unfinished | No | |
 | FileLoader | A file handling system that can automatically load files and return them efficiently. | Working, poorly tested | No | |
 | ObjectSaveLoad | System for saving and loading objects descending from Object. | Finished | Yes | |
-| ObjectPicker3D | Helper for using raycasting from a Camera3D. | Finished | No | Possibly deprecated by 4.0. PackedScene can do this now. |
+| ObjectPicker3D | Helper for using raycasting from a Camera3D. | Finished | No | |
 | PivotCamera3D | Camera that rotates around it's origin. | Finished | No | |
-| ObjectSaveLoad | System for saving and loading objects descending from Object. | Finished | Yes | |
+| ObjectSaveLoad | System for saving and loading objects descending from Object. | Finished | Yes | Possibly deprecated by 4.0. PackedScene can do this now. |
 | SettingList | Container that creates controls for changing variables depending on their value type. | Working | Mostly | |
 | ToolTip | Custom tooltip node. | Buggy | No | |
 | TSCNSelectContainer | Container that displays scenes and allows loading them with a single click. | Finished | Yes | |
