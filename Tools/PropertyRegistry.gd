@@ -1,10 +1,15 @@
 @tool
 extends Node
 class_name PropertyRegistry
+## Creates files based on existing scripts, useful for automation of code duplication
+
 
 const LB:String = "\n"
 const TAB:String = "	"
 const QUOTE:String = "\""
+
+## Disables a filter.
+const NO_FILTER:int = -1
 
 enum Modes {
 	SIMPLE, ##Creates a new script with all of the properties and signals of the originals 
@@ -13,33 +18,32 @@ enum Modes {
 	}
 
 @export_group("Actions")
-#@export var saveToConfigFile:bool
-## Creates the script with the selected settings
+## Creates the script with the selected settings, calls create_file(sourceScripts)
 @export var createScript:bool:
 	set(val):
 		createScript = false
-		save_scripts(sourceScripts)
+		create_file(sourceScripts)
 
 @export var mode:Modes
-
 
 
 @export_group("File")
 @export var saveFolder:String = "res://RegistryOutput/"
 @export var fileName:String = "Registry"
 
-## What the resulting script will extend, leave empty for none
+## What the resulting script will extend, leave empty for none.
 @export var scriptExtends:StringName = ""
 ## The class_name of the resulting script, leave empty for none. Requires scriptExtends to not be empty.
 @export var scriptClassName:StringName = ""
 
-@export_group("Property Config")
-@export var sourceScripts:Array[Script]
-@export var propertyTypeFilter:String = ""
-#@export var signalNameFilters:Array[StringName]
-#@export var propertyNameFilters:Array[StringName]
+@export_group("Generation")
 
-## Header not included
+## From which scripts to take data from
+@export var sourceScripts:Array[Script]
+
+## Only considers properties of the given type.
+@export var propertyTypeFilter:Variant.Type = NO_FILTER
+
 func create_file_contents_simple(script:Script)->String:
 	if DirAccess.make_dir_recursive_absolute(saveFolder) != OK: push_error("Cannot create folder " + saveFolder)
 	var newFile := FileAccess.open(saveFolder+fileName+".gd", FileAccess.WRITE_READ)
@@ -100,7 +104,8 @@ func create_file_contents_constant(script:Script)->String:
 			
 	return signalText + propertyText
 
-func save_scripts(scripts:Array[Script]=sourceScripts):
+## Creates the file using all the properties set.
+func create_file(scripts:Array[Script]=sourceScripts):
 	if DirAccess.make_dir_recursive_absolute(saveFolder) != OK: push_error("Cannot create folder " + saveFolder)
 	var newFile := FileAccess.open(saveFolder+fileName+".gd", FileAccess.WRITE_READ)
 	
@@ -144,40 +149,8 @@ func create_file_contents_signal(script:Script)->String:
 			
 	return signalText
 
-
-
-#func save_script():
-#	if DirAccess.make_dir_recursive_absolute(saveFolder) != OK: push_error("Cannot create folder " + saveFolder)
-#	var newFile := FileAccess.open(saveFolder+fileName+".gd", FileAccess.WRITE_READ)
-#	#Script initials
-#	newFile.store_line("extends " + scriptClass)
-#
-#	#Content
-#
-#	for script in sourceScripts:
-#		var signals:Array[Dictionary] = script.get_script_signal_list()
-#
-#		for signa in signals:
-#			print(signa)
-#			var signalName:String = signa["name"]
-#			#TODO make it include arguments
-#			newFile.store_line("signal " + signalName)
-#
-#		newFile.store_line("")
-#
-#		var properties:Array[Dictionary] = script.get_script_property_list()
-#		for property in properties:
-#			if _filter_property(property) == false: continue
-#
-#			var propName:String = property["name"]
-#			var propType:String = get_type_name(property["type"])
-#
-#			var text:String = "var " + propName + propType
-#			newFile.store_line( text )
-#
-#	newFile.close()
 	
-
+## Returns the type of the given Variant.Type in string format, as used for typecasting (eg. ":bool" ). Not all types are supported.
 func get_type_name(type:Variant.Type)->String:
 	match type:
 		Variant.Type.TYPE_BOOL:
@@ -202,8 +175,7 @@ func get_type_name(type:Variant.Type)->String:
 			return ""
 			push_warning("Unrecognized type {0}. No casting was performed.".format([type]))
 
-	pass
-	
+## Attempts to get the class_name defined on the given script. Generates a unique name if it can't.	
 func get_script_class_name(script:Script)->String:
 	var className:String = ""
 	
@@ -231,7 +203,10 @@ func get_header_text()->String:
 
 
 func _filter_property(property:Dictionary)->bool:
-	return true
+	if propertyTypeFilter == -1 or property["type"] == propertyTypeFilter:
+		return true
+	else: 
+		return false
 	
 func _filter_signal(signa:Dictionary)->bool:
 	return true
