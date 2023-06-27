@@ -34,6 +34,15 @@ signal camera_ready(cameraRef)
 		cameraActive = value
 		camera.current = value
 
+@export var controlActions:Dictionary = {
+	"rotate_left":"",
+	"rotate_right":"",
+	"rotate_up":"",
+	"rotate_down":"",
+	"zoom_in":"",
+	"zoom_out":"",
+}
+
 func _ready() -> void:
 	setup_camera()
 	rotation_degrees = defaultRotation
@@ -53,12 +62,12 @@ func setup_camera(_cameraPos:Vector3=cameraPos, _cameraRot:Vector3=cameraRot):
 
 func _process(delta: float) -> void:
 	if controlsActive:
-		if Input.is_action_pressed("rotate_left"): rotation.y -= rotationSpeed * delta
-		elif Input.is_action_pressed("rotate_right"): rotation.y += rotationSpeed * delta
-		if Input.is_action_pressed("rotate_up"): rotation.x -= rotationSpeed * delta
-		elif Input.is_action_pressed("rotate_down"): rotation.x += rotationSpeed * delta
-		if Input.is_action_pressed("zoom_in"): cameraPos.z -= zoomSpeed * delta
-		elif Input.is_action_pressed("zoom_out"): cameraPos.z += zoomSpeed * delta
+		if Input.is_action_pressed(controlActions["rotate_left"]): rotation.y -= rotationSpeed * delta
+		elif Input.is_action_pressed(controlActions["rotate_right"]): rotation.y += rotationSpeed * delta
+		if Input.is_action_pressed(controlActions["rotate_up"]): rotation.x -= rotationSpeed * delta
+		elif Input.is_action_pressed(controlActions["rotate_down"]): rotation.x += rotationSpeed * delta
+		if Input.is_action_pressed(controlActions["zoom_in"]): cameraPos.z -= zoomSpeed * delta
+		elif Input.is_action_pressed(controlActions["zoom_out"]): cameraPos.z += zoomSpeed * delta
 		rotation_degrees.x = clamp(rotation_degrees.x, -90, 90)
 		
 		

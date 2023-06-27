@@ -4,10 +4,12 @@ class_name DecoratedList
 
 @export var entries:Array[StringName]
 @export var icons:Array[Texture] #entryIndex:Texture
+@export var entryNameOverrides:Array[String]
 @export var defaultObject:Node
 
 func _ready():
-	update_from_entries()
+	if defaultObject:
+		update_from_entries()
 	
 func set_fonts(nameFont:Font, valFont:Font):
 	for child in get_children():
@@ -26,8 +28,15 @@ func update_from_entries(objectUsed:Object = defaultObject):
 			icon = icons[index]
 		else:
 			icon = null
-			
-		add_entry_node(objectUsed, entry, "", icon)
+		
+		var displayedText:String
+		if not entryNameOverrides.is_empty() and index < entryNameOverrides.size(): 
+			displayedText = entryNameOverrides[index]
+		else:
+			displayedText = entry
+		
+		
+		add_entry_node(objectUsed, entry, displayedText, icon)
 		index+=1
 
 	
