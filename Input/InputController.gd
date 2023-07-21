@@ -10,10 +10,10 @@ signal input_lent(toWhat:InputController)
 signal input_returned()
 
 ## If this isn't null, it will emit input_returned. The device set will be replaced by the first device that this InputController listens to.
-@export var returnControlInput:InputEvent:
-	set(val):
-		returnControlInput = val
-		returnControlInput.device = deviceIDs[0]
+#@export var returnControlInput:InputEvent:
+#	set(val):
+#		returnControlInput = val
+#		returnControlInput.device = deviceIDs[0]
 
 ## Which devices this responds to, should never be empty.
 @export var deviceIDs:Array[int] = [0]
@@ -26,18 +26,22 @@ signal input_returned()
 @onready var target:Node=exportedTarget:
 	set(val):		
 		if target == null or not target.is_inside_tree(): return
-		if target.has_method("_unhandled_input"):
-			if input_relayed.is_connected(Callable(target,"_unhandled_input")): disconnect("input_relayed",Callable(target,"_unhandled_input"))
+		if target.has_method(inputMethodName):
+			if input_relayed.is_connected(Callable(target, inputMethodName)): input_relayed.disconnect(Callable(target, inputMethodName))
 			target.set_process_unhandled_input(true)
 			target = val
 			target.set_process_unhandled_input(false)
-			input_relayed.connect(Callable(target,"_unhandled_input"))
+			input_relayed.connect(Callable(target, inputMethodName))
 		else:
 			push_error("This target cannot receive inputs.")
+			
 @export var active:bool=true:
 	set(val):
 		active = val
 #		set_process_unhandled_input(active)
+
+@export var inputMethodName:String = "_unhandled_input"
+
 
 func _ready():
 	var temp = active
@@ -58,17 +62,19 @@ func lend_input(controller:InputController):
 	
 	controller.input_returned.connect(Callable(self,"set").bind("active",true), CONNECT_ONE_SHOT)
 	
-	emit_signal("input_lent",controller)
+	input_lent.emit(controller)
 	
 ## Gives control back to any InputController that may have lent it to it.
 func return_control():
 	if input_returned.get_connections().is_empty(): push_error("No one was awaiting for this InputController"); return
 	
-	emit_signal("input_returned")
+	input_returned.emit()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event == returnControlInput: return_control()
-	elif deviceIDs.has(event.device) and active:
+#	if event == returnControlInput: return_control()
+	if deviceIDs.has(event.device) and active:
 #		target.call("_unhandled_input",event)
-		emit_signal("input_relayed", event)
+#		input_relayed.emit(event)
+		target.call(inputMethodName, event)
+		
 
