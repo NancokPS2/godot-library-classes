@@ -1,21 +1,18 @@
 extends Node2D
 class_name BodyMover2D
 
-@export var bodyToMove:CharacterBody3D
+@export var bodyToMove:CharacterBody2D
 
 @export var speed = 5.0
 
+@export var dragFactor:float = 0.05
+
 @export var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 
-var inputDir:Vector2
-var lookDir:Vector2
+var inputDir:Vector2:
+	set(val):
+		inputDir = val.normalized()
 
-
-const InputActions = {
-	"JUMP":1<<0,
-	"CROUCH":1<<1,
-	"RUN":1<<2
-}
 
 func _unhandled_input(_event: InputEvent) -> void:
 	input_update(_event)
