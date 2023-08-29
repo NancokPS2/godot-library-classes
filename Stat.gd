@@ -1,4 +1,4 @@
-extends Resource
+extends Object
 class_name Stat
 
 signal dummy_signal
@@ -17,10 +17,11 @@ signal depleted
 
 @export var current:float:
 	set(val):
-		if forceMax: current = clamp(val, 0, maxVal)
-		else: current = val
+		if useAsInt: val = val as int
+		if forceMax: val = clamp(val, 0, maxVal)
 		
-		if useAsInt: current = current as int
+		current = val
+		
 		values_changed.emit()
 		if autoSignalOnChange is Signal: autoSignalOnChange.emit()
 
@@ -29,7 +30,7 @@ signal depleted
 
 @export var autoSignalOnChange:Signal
 
-func _init(_max:float, _current:float, _name:StringName):
+func _init(_max:float, _current:float=_max, _name:StringName=""):
 	maxVal = _max
 	current = _current
 	name = _name
