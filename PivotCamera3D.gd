@@ -70,5 +70,6 @@ func _process(delta: float) -> void:
 		elif Input.is_action_pressed(controlActions["zoom_out"]): cameraPos.z += zoomSpeed * delta
 		rotation_degrees.x = clamp(rotation_degrees.x, -90, 90)
 		
-		
+func get_camera()->Camera3D:
+	return camera
 		
