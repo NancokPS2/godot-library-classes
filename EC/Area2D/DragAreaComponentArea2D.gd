@@ -1,5 +1,6 @@
 extends ComponentNode
 class_name Area2DComponentDragCharacterBodies
+#Applies "drag" to CharacterBody3Ds that enter the area, slowing them down.
 
 @export var dragCurve:=Curve.new()
 @export var maxVelocity:float = 200
