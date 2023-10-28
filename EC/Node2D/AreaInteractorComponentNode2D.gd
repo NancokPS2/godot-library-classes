@@ -1,8 +1,9 @@
 extends ComponentNode
 class_name Node2DComponentAreaInteractor
 ## Emulates mouse_entered, mouse_exited and input_event signals on an Area2D that is within it's reach.
-## As well as emit signals of it's own.
-## Area2D.input_pickable should be off for the emulation of signals to work properly.
+## As well as emit signals of it's own.  
+## If the mouse goes over an erea that is both within range of the user and has no obstacles between the user and the area. The area's signals are emitted as if it was detecting inputs with input_pickable
+## Area2D.input_pickable should be off for the emulation of signals to work properly, otherwise the filtering will have no effect.
 
 signal hovered_area(area:Area2D)
 signal interacted_area(area:Area2D)
