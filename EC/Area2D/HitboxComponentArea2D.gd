@@ -10,7 +10,7 @@ const NO_INDIVIDUAL_INVUL_TIMER:float = 0
 static var hitboxDict:Dictionary
 
 signal hit_dealt
-signal damage_dealt
+signal damage_dealt(amount:float)
 
 signal hit_taken
 signal damage_taken(amount:float)
