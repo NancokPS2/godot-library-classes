@@ -1,6 +1,6 @@
 extends ComponentNode
 class_name Area2DComponentInputActionReceiver
-#Can be used by an area to receive inputs filtered by the type name of the action in question
+#Can be used by an area to receive inputs filtered by the name of the action in question
 
 signal interacted
 
