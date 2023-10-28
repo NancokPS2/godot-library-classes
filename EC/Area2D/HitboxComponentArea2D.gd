@@ -1,5 +1,6 @@
 extends ComponentNode
 class_name Area2DComponentHitbox
+#A simply node that uses an Area2D's collisions for dealing and receiving "damage"
 
 enum Types {HITTER, RECEIVER}
 
