@@ -1,5 +1,6 @@
 extends ComponentNode
 class_name Character2DComponentAI
+## From a different project...
 ## Depending on which aiCompRef components the character has, it will enable different methods to use them.
 ## To override how a character uses a component, override it's process_
 
