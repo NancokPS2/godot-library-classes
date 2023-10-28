@@ -1,9 +1,8 @@
 extends ComponentNode
 class_name Area2DComponentInputActionReceiver
+#Can be used by an area to receive inputs filtered by the type name of the action in question
 
 signal interacted
-
-signal interaction_finished
 
 @export var actionName:StringName = &"interact"
 
@@ -13,15 +12,11 @@ func _is_node_valid_parent(node:Node)->bool:
 
 func _parent_update():
 	targetNode.input_event.connect(input_event_receiver)
-	targetNode.mouse_exited.connect( set.bind("actionHeld",false) )
-	
 	
 #New funcs
 func input_event_receiver(_viewport:Node, event:InputEvent, _shape:int):
 	if event.is_action_pressed(actionName):
 		interacted.emit()
 		
-#		if canBeHeld: 
-#			actionHeld = true
 	
 	
