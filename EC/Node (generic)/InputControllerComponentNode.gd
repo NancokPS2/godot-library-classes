@@ -1,5 +1,7 @@
 extends ComponentNode
 class_name NodeComponentInputHelper
+## WIP
+## Used to filter inputs from specific devices, for split screen games.
 
 const MOUSE_AND_KEYBOARD_PREFIX:String = "M&K"
 const MOUSE_AND_KEYBOARD:int = -1
