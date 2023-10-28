@@ -1,5 +1,6 @@
 extends ComponentNode
 class_name Node2DComponentPositionTween
+## A simple tweener that uses percentages to place an item closer or further from its objective location over time, at 100% it goes to finalPos
 
 signal finished_moving
 
