@@ -30,6 +30,7 @@ const UNHANDLED_INPUT_METHOD:String = "_unhandled_input"
 ## Used to set targets from the editor
 @export var inputReceivers:Array[Node]
 			
+## Name of the method that will receive the event on the node, must have a single InputEvent argument
 @export var inputMethodName:String = UNHANDLED_INPUT_METHOD
 
 var prefixedToNormalActions:Dictionary
